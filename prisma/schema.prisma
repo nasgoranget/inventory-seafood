@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id           String             @id @default(cuid())
+  nama         String
+  kategori     String
+  sku          String             @unique
+  satuan       String
+  hargaBeli    Float              @default(0)
+  hargaJual    Float              @default(0)
+  stok         Float              @default(0)
+  minStok      Float              @default(0)
+  aktif        Boolean            @default(true)
+  catatan      String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  transactions StockTransaction[]
+}
+
+model Supplier {
+  id           String             @id @default(cuid())
+  nama         String
+  kontak       String?
+  whatsapp     String?
+  alamat       String?
+  produkUtama  String?
+  catatan      String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  transactions StockTransaction[]
+}
+
+model Customer {
+  id           String             @id @default(cuid())
+  nama         String
+  tipe         String
+  kontak       String?
+  whatsapp     String?
+  alamat       String?
+  catatan      String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  transactions StockTransaction[]
+}
+
+model StockTransaction {
+  id         String    @id @default(cuid())
+  tanggal    DateTime  @default(now())
+  tipe       String
+  jumlah     Float
+  satuan     String
+  referensi  String?
+  catatan    String?
+  productId  String
+  supplierId String?
+  customerId String?
+  product    Product   @relation(fields: [productId], references: [id])
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  createdAt  DateTime  @default(now())
+}
